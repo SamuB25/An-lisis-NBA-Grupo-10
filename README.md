@@ -7,10 +7,13 @@ El rendimiento de los jugadores de la NBA ha evolucionado significativamente en 
 
 ¿Cómo ha variado el rendimiento de la conversión de puntos en los últimos 28 años y que periodo cuatrienal ha obtenido mayor desempeño en conversión de canastas?
 
-## Justificación de la Investigación
+## Justificación
 •	Importancia del análisis de datos en el deporte para identificar tendencias y patrones.
+
 •	Aplicación de técnicas estadísticas y visualización de datos para entender el rendimiento de conversión y asistencias.
+
 •	Determinar para los analistas del campo, la eficiencia de los avances deportivos para la preparación de los jugadores de la NBA.
+
 •	Identificar que tan efectivo han sido los cambios en la NBA a nivel de conversiones de canasta y asistencias en los últimos 28 años.
 
 ## Límites y Alcances
