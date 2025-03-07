@@ -19,6 +19,7 @@ El rendimiento de los jugadores de la NBA ha evolucionado significativamente en 
 ## Límites y Alcances
 ### Límites: 
 •	La base de datos abarca las últimas 28 temporadas (desde 1996-1997 hasta 2023-2024). No se considerarán ligas menores ni otros deportes.
+
 •	No se considerará los tipos de entrenamientos ni las reglas que se hayan implementado a lo largo de este periodo de 28 años.
 ### Alcances: 
 •	Se analizarán variables como puntos por partido, asistencias, porcentaje de tiros de campo, entre otros.
