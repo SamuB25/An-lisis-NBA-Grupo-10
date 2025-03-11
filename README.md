@@ -34,5 +34,5 @@ Estas métricas son indicadores clave del rendimiento en la creación de puntos 
 
 La NBA ha experimentado cambios significativos en las últimas tres décadas, como el uso de la línea de tres puntos, que ha incrementado exponencialmente, especialmente en las últimas dos décadas, en 2001 La prohibición de la defensa en zona y la introducción de la defensa "hand-checking" han influido en el estilo de juego. Por otra parte el baloncesto moderno se caracteriza por un ritmo más rápido, mayor énfasis en el tiro de tres puntos y la versatilidad de los jugadores.
 
-
-
+## Base de datos usanda en el Trabajo
+https://drive.google.com/file/d/1ysNV11MwBDXRfg_THdXXpRUhfDNCIkE2/view?usp=classroom_web&authuser=0
