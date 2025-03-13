@@ -5,6 +5,7 @@ if (!require(tidyverse)) install.packages("tidyverse")
 if (!require(ggplot2)) install.packages("ggplot2")
 if (!require(readxl)) install.packages("readxl")
 if (!require(plotly)) install.packages("plotly")
+if (!require(plotly)) install.packages("DT")
 
 library(shiny)
 library(shinydashboard)
@@ -12,6 +13,7 @@ library(tidyverse)
 library(ggplot2)
 library(readxl)
 library(plotly)
+library(DT)
 
 # Lectura de base de datos
 NBA <- read_excel("~/An-lisis-NBA-Grupo-10/NBA G1-G10.xlsx")
@@ -33,42 +35,13 @@ NBA <- NBA %>%
     PTS3PT. = as.numeric(PTS3PT.),
     PTSFT. = as.numeric(PTSFT.),
     Season = as.character(Season),
-    Años_J = as.numeric(sub("-.*", "", Season)),
-    intervalo = cut(Años_J, 
-                    breaks = seq(1996, 2024, by = 4), 
-                    labels = c("1996-2000", "2000-2004", "2004-2008", "2008-2012", 
-                               "2012-2016", "2016-2020", "2020-2024"), 
-                    include.lowest = TRUE)
+    NBA <- NBA %>%
+      mutate(Años_J = as.numeric(sub("-.*", "", Season)),
+             intervalo = cut(Años_J, 
+                             breaks = seq(1996, 2024, by = 4), 
+                             labels = c("1996-2000", "2000-2004", "2004-2008", "2008-2012", "2012-2016", "2016-2020", "2020-2024"), 
+                             include.lowest = TRUE))
   )
-
-# Creación de tablas para formación de gráficos
-Promedio_3P <- NBA %>%
-  group_by(intervalo) %>%
-  dplyr::summarize(total_3P = mean(X3P., na.rm = TRUE))
-
-Promedio_FT <- NBA %>%
-  group_by(intervalo) %>%
-  dplyr::summarize(total_FT = mean(FT., na.rm = TRUE))
-
-Promedio_DD2 <- NBA %>%
-  group_by(intervalo) %>%
-  dplyr::summarize(total_DD2 = sum(DD2, na.rm = TRUE))
-
-Promedio_DD3 <- NBA %>%
-  group_by(intervalo) %>%
-  dplyr::summarize(total_DD3 = sum(DD3, na.rm = TRUE))
-
-Promedio_PTS2PT <- NBA %>%
-  group_by(intervalo) %>%
-  dplyr::summarize(total_PTS2TP = mean(PTS2PT., na.rm = TRUE))
-
-Promedio_PTS3PT <- NBA %>%
-  group_by(intervalo) %>%
-  dplyr::summarize(total_PTS3TP = mean(PTS3PT., na.rm = TRUE))
-
-Promedio_PTSFT <- NBA %>%
-  group_by(intervalo) %>%
-  dplyr::summarize(total_PTSFT = mean(PTSFT., na.rm = TRUE))
 
 # Definir la interfaz de usuario (UI)
 ui <- dashboardPage(
@@ -78,16 +51,50 @@ ui <- dashboardPage(
     sidebarMenu(
       menuItem("Inicio", tabName = "inicio", icon = icon("home")),
       menuItem("Gráficos Seleccionados", tabName = "graficos", icon = icon("chart-bar")),
-      menuItem("Filtros", tabName = "filtros", icon = icon("filter"))
+      # Agregar el sliderInput y selectInput directamente en el sidebarMenu
+      sliderInput("intervalo_tiempo", "Selecciona el intervalo de tiempo:",
+                  min = 1996, max = 2024, value = c(1996, 2024)),
+      selectInput("grafico", "Selecciona un gráfico:",
+                  choices = c("Distribución de Puntos por Temporada",
+                              "Asistencias por Temporada",
+                              "Porcentaje de Tiros de Campo",
+                              "Porcentaje de Triples",
+                              "Porcentaje de Tiros Libres",
+                              "Dobles-Dobles y Dobles-Triples",
+                              "Puntos por Tipo de Tiro"))
     )
   ),
   dashboardBody(
+    tags$style(HTML("
+      /* Fondo de color azul oscuro para toda la página */
+      .content-wrapper, .right-side {
+        background-color: #001f3f;  /* Azul oscuro */
+        color: #ffffff;  /* Texto blanco */
+        padding: 20px;   /* Espaciado interno */
+      }
+      
+      /* Fondo de color para las cajas (boxes) */
+      .box {
+        background-color: #b0c4de;  /* Color azul claro */
+        border-radius: 10px;        /* Bordes redondeados */
+        padding: 15px;              /* Espaciado interno */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
+        color: #000000 !important; /* Texto en negro */
+        font-weiht: bold /* En negrita */
+      }
+      
+      /* Color del texto en las pestañas */
+      .nav-tabs-custom .nav-tabs li.active a {
+        background-color: #00284d;  /* Azul oscuro más claro */
+        color: #d3d3d3;  /* Texto blanco */
+      }
+    ")),
     tabItems(
       tabItem(
         tabName = "inicio",
-        h1(" Análisis estadistico por perido intercuartilico de la NBA"),
+        h1(" Análisis estadistico por periodo intercuartilico de la NBA"),
         h2("Vamos a Analizar la eficencia de la NBA desde 1996 hasta 2024"),
-        p("Esta aplicación tiene cnm finalidad analizar y representar grafica-mente los datos recolectados de la NBA, como puntos, asistencias, porcentajes de tiros, Etc. Desde 1996 hasta el año 2024"),
+        p("Esta aplicación tiene con la finalidad analizar y representar grafica-mente los datos recolectados de la NBA, como puntos, asistencias, porcentajes de tiros, Etc. Desde 1996 hasta el año 2024"),
         hr(),  # Línea horizontal
         h3("Integrantes:"),
         tags$ul(
@@ -120,25 +127,14 @@ ui <- dashboardPage(
                   width = 12,
                   textOutput("descripcion_grafico")
                 )
-              )
-      ),
-      tabItem(tabName = "filtros",
+              ),
               fluidRow(
                 box(
-                  title = "Filtros",
-                  status = "warning",
+                  title = "Tabla de Datos",
+                  status = "success",
                   solidHeader = TRUE,
                   width = 12,
-                  sliderInput("intervalo_tiempo", "Selecciona el intervalo de tiempo:",
-                              min = 1996, max = 2024, value = c(1996, 2024)),
-                  selectInput("grafico", "Selecciona un gráfico:",
-                              choices = c("Distribución de Puntos",
-                                          "Asistencias por Temporada",
-                                          "Porcentaje de Tiros de Campo",
-                                          "Porcentaje de Triples",
-                                          "Porcentaje de Tiros Libres",
-                                          "Dobles-Dobles y Dobles-Triples",
-                                          "Puntos por Tipo de Tiro"))
+                  DTOutput("tabla_datos")  # Tabla de datos
                 )
               )
       )
@@ -157,13 +153,13 @@ server <- function(input, output) {
   # Texto descriptivo del gráfico
   output$descripcion_grafico <- renderText({
     switch(input$grafico,
-           "Distribución de Puntos" = "Este gráfico muestra la distribución de puntos (PTS) anotados por los jugadores en los intervalos cuatreanales por temporada, desde 1996 hasta 2024. Donde se puede vizualisar donde se encuentra la mayor tendencia de estos.",
-           "Asistencias por Temporada" = "Este gráfico muestra la distribución del porcentaje de asistencias realizadas y encestadas (AST%) por intervalos cuatreanales de las temporadas, desde 1996 hasta 2024.",
-           "Porcentaje de Tiros de Campo" = "Este gráfico muestra el porcentaje de tiros de campo realizados y encestados (FG%) por intervalos cuatreanales de las temporadas, desde 1996 hasta 2024.",
-           "Porcentaje de Triples" = "Este gráfico muestra el porcentaje de triples (3P%) realizados y anotados por intervalos cuatreanales de las temporadas, desde 1996 hasta 2024.",
-           "Porcentaje de Tiros Libres" = "Este gráfico muestra el porcentaje de tiros libres (FT%) realizados y anotados por intervalo cuatreanalaes de las temporadas, desde 1996 hasta 2024.",
-           "Dobles-Dobles y Dobles-Triples" = "Este gráfico muestra la cantidad de dobles-dobles (DD2) y dobles-triples (DD3) que han realizado todos los jugadores por intervalos cuatreanales de las temporadas desde 1996 hasta 2024.",
-           "Puntos por Tipo de Tiro" = "Este gráfico muestra la distribución de puntos por dobles, triples y tiros libres realizados por intervalos cuatreanales de las temporadas desde 1996 hasta 2024."
+           "Distribución de Puntos por Temporada" = "Este gráfico muestra la distribución de puntos (PTS) anotados por los jugadores en los intervalos cuatrienales por temporada, desde 1996 hasta 2024. Donde se puede vizualisar donde se encuentra la mayor tendencia de estos.",
+           "Asistencias por Temporada" = "Este gráfico muestra la distribución del porcentaje de asistencias realizadas y encestadas (AST%) por intervalos cuatrienales de las temporadas, desde 1996 hasta 2024.",
+           "Porcentaje de Tiros de Campo" = "Este gráfico muestra el porcentaje de tiros de campo realizados y encestados (FG%) por intervalos cuatrienales de las temporadas, desde 1996 hasta 2024.",
+           "Porcentaje de Triples" = "Este gráfico muestra el porcentaje de triples (3P%) realizados y anotados por intervalos cuatrienales de las temporadas, desde 1996 hasta 2024.",
+           "Porcentaje de Tiros Libres" = "Este gráfico muestra el porcentaje de tiros libres (FT%) realizados y anotados por intervalo cuatrienalaes de las temporadas, desde 1996 hasta 2024.",
+           "Dobles-Dobles y Dobles-Triples" = "Este gráfico muestra la cantidad de dobles-dobles (DD2) y dobles-triples (DD3) que han realizado todos los jugadores por intervalos cuatrienales de las temporadas desde 1996 hasta 2024.",
+           "Puntos por Tipo de Tiro" = "Este gráfico muestra la distribución de puntos por dobles, triples y tiros libres realizados por intervalos cuatrienales de las temporadas desde 1996 hasta 2024."
     )
   })
   
@@ -172,7 +168,7 @@ server <- function(input, output) {
     datos_filtrados <- NBA_filtrado()
     
     p <- switch(input$grafico,
-                "Distribución de Puntos" = {
+                "Distribución de Puntos por Temporada" = {
                   ggplot(datos_filtrados, aes(x = PTS)) +
                     geom_histogram(binwidth = 50, fill = "darkblue", color = "black") +
                     labs(title = "Distribución de Puntos", x = "Puntos (PTS)", y = "Frecuencia") +
@@ -226,7 +222,6 @@ server <- function(input, output) {
                   plot1 <- ggplotly(p1)
                   plot2 <- ggplotly(p2)
                   
-                  # Usar plotly::subplot explícitamente
                   plotly::subplot(plot1, plot2, nrows = 2, titleX = TRUE, titleY = TRUE) %>%
                     layout(title = list(text = "DD2 Y DD3 por Intervalo Cuatrienales de las Temporadas",
                                         font = list(size = 16)),
@@ -268,8 +263,32 @@ server <- function(input, output) {
     if (input$grafico != "Puntos por Tipo de Tiro" && input$grafico != "Dobles-Dobles y Dobles-Triples") {
       ggplotly(p)
     } else {
-      p  # Ya es un objeto
+      p 
     }
+  })
+  
+  # Tabla de datos correspondiente al gráfico seleccionado
+  output$tabla_datos <- renderDT({
+    datos_filtrados <- NBA_filtrado()
+    
+    tabla <- switch(input$grafico,
+                    "Distribución de Puntos por Temporada" = datos_filtrados %>% select(intervalo, Player, PTS),
+                    "Asistencias por Temporada" = datos_filtrados %>% select(intervalo, Player, AST.),
+                    "Porcentaje de Tiros de Campo" = datos_filtrados %>% select(intervalo, Player, FG.),
+                    "Porcentaje de Triples" = datos_filtrados %>% select(intervalo, Player, X3P.),
+                    "Porcentaje de Tiros Libres" = datos_filtrados %>% select(intervalo, Player, FT.),
+                    "Dobles-Dobles y Dobles-Triples" = datos_filtrados %>% select(intervalo, Player, DD2, DD3),
+                    "Puntos por Tipo de Tiro" = datos_filtrados %>% select(intervalo, Player, PTS2PT., PTS3PT., PTSFT.)
+    )
+    
+    # Personalizar la tabla con DT
+    datatable(tabla, 
+              options = list(
+                pageLength = 10,  # Mostrar 10 filas por página
+                order = list(0, 'des')  # Ordenar por la segunda columna (intervalo) de forma ascendente
+              ),
+              rownames = FALSE  # No mostrar números de fila
+    )
   })
 }
 
