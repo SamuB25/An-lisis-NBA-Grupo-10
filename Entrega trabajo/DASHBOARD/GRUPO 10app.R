@@ -1,4 +1,11 @@
 # Carga de librerías
+if (!require(shiny)) install.packages("shiny")
+if (!require(shinydashboard)) install.packages("shinydashboard")
+if (!require(tidyverse)) install.packages("tidyverse")
+if (!require(ggplot2)) install.packages("ggplot2")
+if (!require(readxl)) install.packages("readxl")
+if (!require(plotly)) install.packages("plotly")
+
 library(shiny)
 library(shinydashboard)
 library(tidyverse)
@@ -65,15 +72,36 @@ Promedio_PTSFT <- NBA %>%
 
 # Definir la interfaz de usuario (UI)
 ui <- dashboardPage(
-  dashboardHeader(title = "Análisis del rendimiento en la NBA"),
+  skin = "purple",
+  dashboardHeader(title = "Análisis NBA"),
   dashboardSidebar(
     sidebarMenu(
-      menuItem("Gráficos principales", tabName = "graficos", icon = icon("chart-bar")),
+      menuItem("Inicio", tabName = "inicio", icon = icon("home")),
+      menuItem("Gráficos Seleccionados", tabName = "graficos", icon = icon("chart-bar")),
       menuItem("Filtros", tabName = "filtros", icon = icon("filter"))
     )
   ),
   dashboardBody(
     tabItems(
+      tabItem(
+        tabName = "inicio",
+        h1(" Análisis estadistico por perido intercuartilico de la NBA"),
+        h2("Vamos a Analizar la eficencia de la NBA desde 1996 hasta 2024"),
+        p("Esta aplicación tiene cnm finalidad analizar y representar grafica-mente los datos recolectados de la NBA, como puntos, asistencias, porcentajes de tiros, Etc. Desde 1996 hasta el año 2024"),
+        hr(),  # Línea horizontal
+        h3("Integrantes:"),
+        tags$ul(
+          tags$li("Leonardo Mentado C.I: 29.850.786."),
+          tags$li("Samuel Barreto C.I: 31.484.531.")
+        ),
+        h3("Instrucciones:"),
+        tags$ol(
+          tags$li("Selecciona la pestaña 'Gráficos Seleccionados' para ver los gráficos disponibles."),
+          tags$li("Usa los filtros en la pestaña 'Filtros' para ajustar el intervalo de tiempo."),
+          tags$li("Explora los gráficos y descarga los datos si es necesario.")
+        ),
+        plotlyOutput("grafico_inicio")  # Gráfico interactivo en el inicio
+      ),
       tabItem(tabName = "graficos",
               fluidRow(
                 box(
@@ -81,7 +109,7 @@ ui <- dashboardPage(
                   status = "primary",
                   solidHeader = TRUE,
                   width = 12,
-                  plotlyOutput("grafico_seleccionado", height = "500px")
+                  plotlyOutput("grafico_seleccionado", height = "700px")
                 )
               ),
               fluidRow(
@@ -159,77 +187,85 @@ server <- function(input, output) {
                     scale_fill_brewer(palette = "Set3")
                 },
                 "Porcentaje de Tiros de Campo" = {
-                  ggplot(datos_filtrados, aes(x = intervalo, y = FG.)) +
-                    geom_bar(stat = "identity", color = "darkblue") +
+                  ggplot(datos_filtrados, aes(x = intervalo, y = FG., fill = intervalo)) +
+                    geom_boxplot(color = "darkblue") +
                     labs(title = "Distribución de Porcentaje de Tiros de Campo por Intervalo de Temporada", 
                          x = "Intervalo de Temporada", y = "Porcentaje de Tiros de Campo") +
-                    theme_minimal()
+                    theme_minimal() +
+                    scale_fill_brewer(palette = "Set3")
                 },
                 "Porcentaje de Triples" = {
-                  ggplot(Promedio_3P, aes(x = intervalo, y = total_3P, color = intervalo)) +
-                    geom_point(size = 3) +
+                  ggplot(datos_filtrados, aes(x = intervalo, y = X3P., fill = intervalo)) +
+                    geom_boxplot(color = "darkblue") +
                     labs(title = "Distribución de Porcentaje de Triples por Intervalo de Temporada", 
                          x = "Intervalo de Temporada", y = "Porcentaje de Triples") +
-                    theme_minimal()
+                    theme_minimal() +
+                    scale_fill_brewer(palette = "Set3")
                 },
                 "Porcentaje de Tiros Libres" = {
-                  ggplot(Promedio_FT, aes(x = intervalo, y = total_FT, color = intervalo)) +
-                    geom_point(size = 3) +
+                  ggplot(datos_filtrados, aes(x = intervalo, y = FT., fill = intervalo)) +
+                    geom_boxplot(color = "darkblue") +
                     labs(title = "Distribución de Porcentaje de Tiros Libres por Intervalo de Temporada", 
                          x = "Intervalo de Temporada", y = "Porcentaje de Tiros Libres") +
-                    theme_minimal()
+                    theme_minimal() +
+                    scale_fill_brewer(palette = "Set3")
                 },
                 "Dobles-Dobles y Dobles-Triples" = {
-                  p1 <- ggplot(Promedio_DD2, aes(x = intervalo, y = total_DD2, fill = intervalo)) +
-                    geom_bar(stat = "identity", color = "darkblue") +
+                  p1 <- ggplot(datos_filtrados, aes(x = intervalo, y = DD2, color = intervalo)) +
+                    geom_point(stat = "identity") +
                     labs(title = "Dobles-Dobles por Intervalo de Temporada", 
                          x = "Intervalo de Temporada", y = "Total de Dobles-Dobles") +
                     theme_minimal()
                   
-                  p2 <- ggplot(Promedio_DD3, aes(x = intervalo, y = total_DD3, fill = intervalo)) +
-                    geom_bar(stat = "identity", color = "darkblue") +
+                  p2 <- ggplot(datos_filtrados, aes(x = intervalo, y = DD3, color = intervalo)) +
+                    geom_point(stat = "identity") +
                     labs(title = "Dobles-Triples por Intervalo de Temporada", 
                          x = "Intervalo de Temporada", y = "Total de Dobles-Triples") +
                     theme_minimal()
                   
-                  subplot(p1, p2, nrows = 2, titleX = TRUE, titleY = TRUE)
+                  plot1 <- ggplotly(p1)
+                  plot2 <- ggplotly(p2)
+                  
+                  # Usar plotly::subplot explícitamente
+                  plotly::subplot(plot1, plot2, nrows = 2, titleX = TRUE, titleY = TRUE) %>%
+                    layout(title = list(text = "DD2 Y DD3 por Intervalo Cuatrienales de las Temporadas",
+                                        font = list(size = 16)),
+                           margin = list(t = 40))
                 },
                 "Puntos por Tipo de Tiro" = {
-                  p1 <- ggplot(Promedio_PTS2PT, aes(x = intervalo, y = total_PTS2TP, color = intervalo)) +
-                    geom_point(size = 3) +
+                  p1 <- ggplot(datos_filtrados, aes(x = intervalo, y = PTS2PT., fill = intervalo)) +
+                    geom_bar(stat = "identity") +
                     labs(title = "Puntos por Dobles por Intervalo de Temporada", 
                          x = "Intervalo de Temporada", y = "Puntos Dobles") +
                     theme_minimal()
                   
-                  p2 <- ggplot(Promedio_PTS3PT, aes(x = intervalo, y = total_PTS3TP, color = intervalo)) +
-                    geom_point(size = 3) +
+                  p2 <- ggplot(datos_filtrados, aes(x = intervalo, y = PTS3PT., fill = intervalo)) +
+                    geom_bar(stat = "identity") +
                     labs(title = "Puntos por Triples por Intervalo de Temporada", 
                          x = "Intervalo de Temporada", y = "Puntos Triples") +
                     theme_minimal()
                   
-                  p3 <- ggplot(Promedio_PTSFT, aes(x = intervalo, y = total_PTSFT, color = intervalo)) +
-                    geom_point(size = 3) +
+                  p3 <- ggplot(datos_filtrados, aes(x = intervalo, y = PTSFT., fill = intervalo)) +
+                    geom_bar(stat = "identity") +
                     labs(title = "Puntos por Tiros Libres por Intervalo de Temporada", 
                          x = "Intervalo de Temporada", y = "Puntos Tiros Libres") +
                     theme_minimal()
                   
-                  # Crear los gráficos con plotly
                   plot1 <- ggplotly(p1) %>% layout(title = list(text = "Puntos por Dobles",
-                                                                font = list(size = 100)))
+                                                                font = list(size = 16)))
                   plot2 <- ggplotly(p2) %>% layout(title = list(text = "Puntos por Triples",
-                                                                font = list(size = 100)))
+                                                                font = list(size = 16)))
                   plot3 <- ggplotly(p3) %>% layout(title = list(text = "Puntos por Tiros Libres",
-                                                                font = list(size = 100)))
+                                                                font = list(size = 16)))
                   
-                  # Combinar los gráficos con subplot y agregar un título general
-                  subplot(plot1, plot2, plot3, nrows = 3, titleX = TRUE, titleY = TRUE) %>%
-                    layout(title = "Puntos por Tipo de Tiro por Intervalo de Temporada",
-                           margin = list(t = 40))  # Ajustar el margen superior para el título
+                  plotly::subplot(plot1, plot2, plot3, nrows = 3, titleX = TRUE, titleY = TRUE) %>%
+                    layout(title = list(text = "Puntos por Tipo de Tiro por Intervalo de Temporada",
+                                        font = list(size = 16)),
+                           margin = list(t = 40))
                 }
     )
     
-    # Convertir a plotly
-    if (input$grafico != "Puntos por Tipo de Tiro") {
+    if (input$grafico != "Puntos por Tipo de Tiro" && input$grafico != "Dobles-Dobles y Dobles-Triples") {
       ggplotly(p)
     } else {
       p  # Ya es un objeto
