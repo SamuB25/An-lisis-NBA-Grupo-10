@@ -1,9 +1,13 @@
 ---
-title: "Análisis del rendimiento ofensivo y defensivo en la NBA mediante la conversión de puntos y asistencias por periodos cuatrienales en los últimos 28 años"
+title: Análisis del rendimiento ofensivo y defensivo en la NBA mediante la conversión
+  de puntos y asistencias por periodos cuatrienales en los últimos 28 años
 author: "Samuel Barreto y Leonardo Mentado"
 date: "`r Sys.Date()`"
-output: pdf_document
-editor_options: 
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+editor_options:
   chunk_output_type: inline
 ---
   
@@ -52,46 +56,6 @@ NBA <- NBA %>%
                          labels = c("1996-2000", "2000-2004", "2004-2008", "2008-2012", "2012-2016", "2016-2020", "2020-2024"), 
                          include.lowest = TRUE))
 
-# Creación de tablas para formación de gráficos
-Promedio_PTS <- NBA %>%
-  group_by(intervalo) %>%
-  dplyr::summarize(total_PTS = sum(PTS, na.rm = TRUE))
-
-Promedio_FG <- NBA %>%
-  group_by(intervalo) %>%
-  dplyr::summarize(total_FG = mean(FG., na.rm = TRUE))
-
-Promedio_3P <- NBA %>%
-  group_by(intervalo) %>%
-  dplyr::summarize(total_3P = mean(X3P., na.rm = TRUE))
-
-Promedio_FT <- NBA %>%
-  group_by(intervalo) %>%
-  dplyr::summarize(total_FT = mean(FT., na.rm = TRUE))
-
-Promedio_AST <- NBA %>%
-  group_by(intervalo) %>%
-  dplyr::summarize(total_AST = mean(AST., na.rm = TRUE))
-
-Promedio_DD2 <- NBA %>%
-  group_by(intervalo) %>%
-  dplyr::summarize(total_DD2 = sum(DD2, na.rm = TRUE))
-
-Promedio_DD3 <- NBA %>%
-  group_by(intervalo) %>%
-  dplyr::summarize(total_DD3 = sum(DD3, na.rm = TRUE))
-
-Promedio_PTS2PT <- NBA %>%
-  group_by(intervalo) %>%
-  dplyr::summarize(total_PTS2TP = mean(PTS2PT., na.rm = TRUE))
-
-Promedio_PTS3PT <- NBA %>%
-  group_by(intervalo) %>%
-  dplyr::summarize(total_PTS3TP = mean(PTS3PT., na.rm = TRUE))
-
-Promedio_PTSFT <- NBA %>%
-  group_by(intervalo) %>%
-  dplyr::summarize(total_PTSFT = mean(PTSFT., na.rm = TRUE))
 ```
 # Introducción
 
@@ -136,11 +100,12 @@ PONER NUEVA DESCRIPCIÓN PARA PORCENTAJE DE ASISTENCIA EN RELACION A LOS PUNTOS.
 
 ```{r Grafico Multivariante 3, fig.align='center', echo=FALSE,out.width='65%'}
 # Total de tiros realizados encestados
-ggplot(Promedio_FG, aes(x = intervalo, y = total_FG, fill = intervalo)) +
-  geom_bar(stat = "identity", color = "darkblue") +
-  labs(title = "Distribución de Porcentaje de Tiros de Campo por Intervalo de Temporada", x = "Intervalo de Temporada", y = "Porcentaje de Tiros de Campo") +
+ggplot(NBA, aes(x = intervalo, y = FG., fill = intervalo)) +
+  geom_boxplot(color = "darkblue") +
+  labs(title = "Distribución de Porcentaje de Tiros por Intervalo de Temporada", x = "Intervalo de Temporada", y = "Porcentaje de Tiros de Campo") +
   theme_minimal() +
-  theme(plot.title = element_text(size = 10, face = "bold"))
+  theme(plot.title = element_text(size = 10, face = "bold")) +
+  scale_fill_brewer(palette = "Set3")
 ```
 ### Estudio gráfico sobre el total de FG%
 PONER NUEVA DESCRIPCION PROMEDIO DE TIROS ANOTADOS CON LANZADDOS.
@@ -148,9 +113,9 @@ PONER NUEVA DESCRIPCION PROMEDIO DE TIROS ANOTADOS CON LANZADDOS.
 
 ```{r Grafico Multivariante 4, echo=FALSE, fig.align='center', out.width='80%', fig.width=8, results='hide'}
 # Dispersión promedio de puntos por triple
-ggplot(Promedio_3P, aes(x = intervalo, y = total_3P, color = intervalo)) +
-  geom_point(size = 3) +
-  labs(title = "Distribución de Porcentaje de Triples por Intervalo de Temporada", x = "Intervalo de Temporada", y = "Porcentaje de Triples") +
+ggplot(NBA, aes(x = intervalo, y = X3P., fill = intervalo)) +
+  geom_boxplot(color = "darkblue") +
+  labs(title = "Distribución de Dobles-Triples por Intervalo de Temporada", x = "Intervalo de Temporada", y = "Total de Dobles-Triples") +
   theme_minimal() +
   theme(plot.title = element_text(size = 10, face = "bold"))
 ```
@@ -163,8 +128,8 @@ PONER NUEVA DESCRIPCION PROMEDIO DE TIROS ANOTADOS CON LANZADDOS.
 
 ```{r Grafico Multivariante 5, echo=FALSE, fig.align='center', out.width='80%', fig.width=8, results='hide'}
 # Dispersión promedio de puntos por tiro libre
-ggplot(Promedio_FT, aes(x = intervalo, y = total_FT, color = intervalo)) +
-  geom_point(size = 3) +
+ggplot(NBA, aes(x = intervalo, y = FT., fill = intervalo)) +
+  geom_boxplot(color = "darkblue") +
   labs(title = "Distribución de Porcentaje de Tiros Libres por Intervalo de Temporada", x = "Intervalo de Temporada", y = "Porcentaje de Tiros Libres") +
   theme_minimal() +
   theme(plot.title = element_text(size = 10, face = "bold"))
@@ -176,15 +141,15 @@ DESCRIPCION DE 3P%
 
 ```{r Graficos Bivariante 5 Y 6, fig.align='center', echo=FALSE,out.width='70%'}
 # Total de DD3 por periodo
-ggplot(Promedio_DD3, aes(x = intervalo, y = total_DD3, fill = intervalo)) +
-  geom_bar(stat = "identity", color = "darkblue") +
+ggplot(NBA, aes(x = intervalo, y = DD3, color = intervalo)) +
+  geom_point(stat = "identity") +
   labs(title = "Distribución de Dobles-Triples por Intervalo de Temporada", x = "Intervalo de Temporada", y = "Total de Dobles-Triples") +
   theme_minimal() +
   theme(plot.title = element_text(size = 10, face = "bold"))
 
 # Total de DD2 por periodo
-ggplot(Promedio_DD2, aes(x = intervalo, y = total_DD2, fill = intervalo)) +
-  geom_bar(stat = "identity", color = "darkblue") +
+ggplot(NBA, aes(x = intervalo, y = DD2, color = intervalo)) +
+  geom_point(stat = "identity") +
   labs(title = "Distribución de Dobles-Dobles por Intervalo de Temporada", x = "Intervalo de Temporada", y = "Total de Dobles-Dobles") +
   theme_minimal() +
   theme(plot.title = element_text(size = 10, face = "bold"))
@@ -199,22 +164,22 @@ NUEVA DESCRIPCION.
 
 ```{r Grafico Bivariante 7 8 Y 9, echo=FALSE, fig.align='center', fig.width=8, out.width='80%'}
 # Promedio de puntos por doble
-ggplot(Promedio_PTS2PT, aes(x = intervalo, y = total_PTS2TP, color = intervalo)) +
-  geom_point(size = 3) +
+ggplot(NBA, aes(x = intervalo, y = PTS2PT., fill = intervalo)) +
+  geom_bar(stat = "identity") +
   labs(title = "Distribución de Puntos por Doble Puntos por Intervalo de Temporada", x = "Intervalo de Temporada", y = "Puntos por Dobles") +
   theme_minimal() +
   theme(plot.title = element_text(size = 10, face = "bold"))
 
 # Puntos por triple
-ggplot(Promedio_PTS3PT, aes(x = intervalo, y = total_PTS3TP, color = intervalo)) +
-  geom_point(size = 3) +
+ggplot(NBA, aes(x = intervalo, y = PTS3PT., fill = intervalo)) +
+  geom_bar(stat = "identity") +
   labs(title = "Distribución de Puntos por Triple Punto por Intervalo de Temporada", x = "Intervalo de Temporada", y = "Puntos por Triples") +
   theme_minimal() +
   theme(plot.title = element_text(size = 10, face = "bold"))
 
 # Puntos por tiro libre
-ggplot(Promedio_PTSFT, aes(x = intervalo, y = total_PTSFT, color = intervalo)) +
-  geom_point(size = 3) +
+ggplot(NBA, aes(x = intervalo, y = PTSFT., fill = intervalo)) +
+  geom_bar(stat = "identity") +
   labs(title = "Distribución de Puntos por Tiros Libres por Intervalo de Temporada", x = "Intervalo de Temporada", y = "Puntos por Tiros Libres") +
   theme_minimal() +
   theme(plot.title = element_text(size = 10, face = "bold"))
