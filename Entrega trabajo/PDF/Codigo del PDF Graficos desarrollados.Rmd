@@ -1,7 +1,7 @@
 ---
-title: Análisis del rendimiento ofensivo y defensivo en la NBA mediante la conversión
-  de puntos y asistencias por periodos cuatrienales en los últimos 28 años
-author: "Samuel Barreto y Leonardo Mentado"
+title: "**Análisis del rendimiento ofensivo y defensivo en la NBA mediante la conversión
+  de puntos y asistencias por periodos cuatrienales en los últimos 28 años**"
+author: "Samuel Barreto 31.484.531 | Leonardo Mentado 29.850.786"
 date: "`r Sys.Date()`"
 output:
   pdf_document: default
@@ -30,7 +30,7 @@ library(dplyr)
 library(tinytex)
 
 # Lectura de base de datos
-NBA <- read_excel("~/An-lisis-NBA-Grupo-10/NBA G1-G10.xlsx")
+NBA <- read_excel("~/An-lisis-NBA-Grupo-10/NBA G1-G10.xlsx") 
 
 # Limpieza de nombres de columnas
 names(NBA) <- make.names(names(NBA))
@@ -56,6 +56,19 @@ NBA <- NBA %>%
                          labels = c("1996-2000", "2000-2004", "2004-2008", "2008-2012", "2012-2016", "2016-2020", "2020-2024"), 
                          include.lowest = TRUE))
 
+#PROMEDIO DE PTS2PT, PTS3PT, PTSFT
+Promedio_PTS2PT <- NBA %>%
+  group_by(intervalo) %>%
+  dplyr::summarize(total_PTS2PT = mean(PTS2PT., na.rm = TRUE))
+
+Promedio_PTS3PT <- NBA %>%
+  group_by(intervalo) %>%
+  dplyr::summarize(total_PTS3PT = mean(PTS3PT., na.rm = TRUE))
+
+Promedio_PTSFT <- NBA %>%
+  group_by(intervalo) %>%
+  dplyr::summarize(total_PTSFT = mean(PTSFT., na.rm = TRUE))
+
 ```
 # Introducción
 
@@ -63,18 +76,18 @@ El rendimiento de los jugadores de la NBA ha evolucionado significativamente en 
   
   ¿Cómo ha variado el rendimiento de la conversión de puntos en los últimos 28 años y que periodo cuatrienal ha obtenido mayor desempeño en conversión de canastas?
   
-  ## Justificación de la Investigación
+# Justificación de la Investigación
   
-  -   Es importante para el análisis de datos en el deporte para identificar tendencias y patrones.
+-   Es importante para el análisis de datos en el deporte para identificar tendencias y patrones.
 -   Uso de técnicas estadísticas y visualización de datos para entender el rendimiento de conversión y asistencias.
 -   Determinar para los analistas del campo, la eficiencia de los avances deportivos para la preparación de los jugadores de la NBA.
 -   Identificar que tan efectivo han sido los cambios en la NBA a nivel de conversiones de canasta y asistencias en los últimos 28 años.
 
 El análisis del rendimiento ofensivo y defensivo en la NBA es fundamental para entender la evolución del baloncesto moderno y cómo los jugadores y equipos han adaptado sus estrategias a lo largo del tiempo. Nos centraremos en el estudio de las métricas clave de rendimiento (puntos y asistencias) y su conversión en periodos cuatrienales (cada 4 años) durante las últimas 28 temporadas (desde 1996 hasta 2024).
 
-## Análisis Univariante
+# Análisis Univariante
 
-```{r Grafico Multivariante 1, fig.align='center', echo=FALSE,out.width='52%'}
+```{r Grafico Univariante 1, fig.align='center', echo=FALSE,out.width='52%'}
 # Puntos por temporada
 ggplot(NBA, aes(x = PTS)) +
   geom_histogram(binwidth = 50, fill = "darkblue", color = "black") +  # Ajusta el binwidth según tus datos
@@ -84,111 +97,117 @@ ggplot(NBA, aes(x = PTS)) +
   theme_minimal() +
   theme(plot.title = element_text(size = 14, face = "bold", hjust = 0.5))
 ```
-### Rendimiento general de las 28 temporadas de la NBA
-* NUEVA DESCRIPCION PARA PROMEDIO DE PUNTOS.
+## Rendimiento general de puntos durante 28 temporadas de la NBA
+* La mayor parte de los datos se concentran en frecuencias bajas (0–50), que tiene un pico excepcional en 0 PTS, lo que sugiere una temporada atípica. Esto puede deberse a la Aparición de jugadores excepcionales, además la mayoría de las temporadas tienen frecuencias bajas, lo que resulta en un rendimiento ofensivo "equilibrado".
+* El gráfico revela una distribución heterogénea, este fenómeno resalta la importancia de combinar análisis estadísticos con contexto histórico.
 
-```{r Grafico Multivariante 2, fig.align='center', echo=FALSE,out.width='70%'}
+
+# Análisis Bivariante
+```{r Grafico Bivariante 1, fig.align='center', echo=FALSE,out.width='70%'}
 # Asistencias por Temporada
 ggplot(NBA, aes(x = intervalo, y = AST., fill = intervalo)) +
   geom_boxplot(color = "darkblue") +
   labs(title = "Distribución de Asistencias por Intervalo de Temporada", x = "Intervalo de Temporada", y = "Porcentaje de Asistencias") +
   theme_minimal() +
   theme(plot.title = element_text(size = 10, face = "bold")) +
-  scale_fill_brewer(palette = "Set3")
+  scale_fill_brewer(palette = "PuBuGn")
 ```
-PONER NUEVA DESCRIPCIÓN PARA PORCENTAJE DE ASISTENCIA EN RELACION A LOS PUNTOS.
+El grafico de caja indica una fuerte presencia de datos atípicos por encima de la media en la mayoría de intervalos que pueden estar vinculados a temporadas históricas contando con un promedio de 642 asistencia por temporada,  como también la introducción del "hand-checking" en 2004. Logrando resaltar la evolución de las asistencias en la NBA, reflejando cambios en estrategias, reglas y roles de los jugadores.
 
-```{r Grafico Multivariante 3, fig.align='center', echo=FALSE,out.width='65%'}
+```{r Grafico Bivariante 2,fig.align='center', echo=FALSE, out.width='65%'}
 # Total de tiros realizados encestados
 ggplot(NBA, aes(x = intervalo, y = FG., fill = intervalo)) +
   geom_boxplot(color = "darkblue") +
   labs(title = "Distribución de Porcentaje de Tiros por Intervalo de Temporada", x = "Intervalo de Temporada", y = "Porcentaje de Tiros de Campo") +
   theme_minimal() +
   theme(plot.title = element_text(size = 10, face = "bold")) +
-  scale_fill_brewer(palette = "Set3")
+  scale_fill_brewer(palette="PuBuGn")
 ```
-### Estudio gráfico sobre el total de FG%
-PONER NUEVA DESCRIPCION PROMEDIO DE TIROS ANOTADOS CON LANZADDOS.
+## Equilibrio en el porcentaje de tiros anotados
+Los valores de tiros de campo porcentual cubren hasta el 100%, lo que indica que el gráfico incluye datos de jugadores individuales y equipos con una amplia gama de eficiencia, también podemos observar que en todos los intervalos el FG% esta entre 40% y 50%, además se odservan valores atipicos que indican tendencias en la eficiencia ofensiva y tiene una distribución simétrica, por lo que la media y la mediana serán similares.
 
 
-```{r Grafico Multivariante 4, echo=FALSE, fig.align='center', out.width='80%', fig.width=8, results='hide'}
+```{r Grafico Bivariante 3, echo=FALSE, fig.align='center', out.width='80%', fig.width=8, results='hide'}
 # Dispersión promedio de puntos por triple
 ggplot(NBA, aes(x = intervalo, y = X3P., fill = intervalo)) +
   geom_boxplot(color = "darkblue") +
   labs(title = "Distribución de Dobles-Triples por Intervalo de Temporada", x = "Intervalo de Temporada", y = "Total de Dobles-Triples") +
   theme_minimal() +
-  theme(plot.title = element_text(size = 10, face = "bold"))
+  theme(plot.title = element_text(size = 10, face = "bold")) + scale_fill_brewer(palette="Blues")
 ```
 
-### Equilibrio en el porcentaje de tiros anotados (periodos cuatrienales)
-DESCRIPCION DE 3P%.
+El gráfico sugiere que la versatilidad de los jugadores en la convercion de Triples (3P%) ha variado significativamente a lo largo del tiempo, con picos que podrían corresponder a jugadores excepcionales. Por otras parte muestra un aumento progresivo en el promedio total de converción de Triples, estos podría deverse a casos de jugadores que según la temporada en las cuales estos participaron, realizaron un y anotaron un solo intento de triple punto, esto podría reflejar un mayor énfasis en la versatilidad de los jugadores con el paso de las temporadas.
 
-### Estudio gráfico sobre el total de FG%
-PONER NUEVA DESCRIPCION PROMEDIO DE TIROS ANOTADOS CON LANZADDOS.
-
-```{r Grafico Multivariante 5, echo=FALSE, fig.align='center', out.width='80%', fig.width=8, results='hide'}
+```{r Grafico Bivariante 4, echo=FALSE, fig.align='center', out.width='80%', fig.width=8, results='hide'}
 # Dispersión promedio de puntos por tiro libre
 ggplot(NBA, aes(x = intervalo, y = FT., fill = intervalo)) +
   geom_boxplot(color = "darkblue") +
   labs(title = "Distribución de Porcentaje de Tiros Libres por Intervalo de Temporada", x = "Intervalo de Temporada", y = "Porcentaje de Tiros Libres") +
   theme_minimal() +
-  theme(plot.title = element_text(size = 10, face = "bold"))
+  theme(plot.title = element_text(size = 10, face = "bold")) + scale_fill_brewer(palette="BuPu")
 ```
-### Equilibrio en el porcentaje de tiros anotados (periodos cuatrienales)
-DESCRIPCION DE 3P%
 
-## Análisis Bivariante
+## Equilibrio en el porcentaje de tiros libre
+Aquí podemos observar claramente los porcentajes de tiros libres que oscilan entre 70% y 80%, esto quiere decir que hay una distribución normal, porque la mayoría de FT% esta alrededor de la media en 75%, pero hay ciertos valores atípicos que se encuentran por debajo de la media durante los 7 intervalos, indicando que siempre ha habido equipos y jugadores que no destacan en tiros libres. Esto permite analizar cómo ha evolucionado el FT% a lo largo del tiempo.
+
 
 ```{r Graficos Bivariante 5 Y 6, fig.align='center', echo=FALSE,out.width='70%'}
+
 # Total de DD3 por periodo
-ggplot(NBA, aes(x = intervalo, y = DD3, color = intervalo)) +
+g1 <- ggplot(NBA, aes(x = intervalo, y = DD3, color = intervalo)) +
   geom_point(stat = "identity") +
-  labs(title = "Distribución de Dobles-Triples por Intervalo de Temporada", x = "Intervalo de Temporada", y = "Total de Dobles-Triples") +
+  labs(title = "Distribución de Dobles-Triples por Intervalo de Temporada", x = "Intervalo de Temporada", y = "Total de DD3") +
   theme_minimal() +
   theme(plot.title = element_text(size = 10, face = "bold"))
 
 # Total de DD2 por periodo
-ggplot(NBA, aes(x = intervalo, y = DD2, color = intervalo)) +
+g2 <- ggplot(NBA, aes(x = intervalo, y = DD2, color = intervalo)) +
   geom_point(stat = "identity") +
-  labs(title = "Distribución de Dobles-Dobles por Intervalo de Temporada", x = "Intervalo de Temporada", y = "Total de Dobles-Dobles") +
+  labs(title = "Distribución de Dobles-Dobles por Intervalo de Temporada", x = "Intervalo de Temporada", y = "Total de DD2") +
   theme_minimal() +
   theme(plot.title = element_text(size = 10, face = "bold"))
+grid.arrange(g2, g1, nrow = 2)
 ```
-## DD2 Y DD3
+## Estudio gráfico de DD2 y DD3 por intervalo de temporada 
+* En la distribución de DD2 el suguiere que, espacio adicional creado por los tiradores de tres puntos en realidad conduce a más intentos de bandejas y a un mayor porcentaje de tiros de dos puntos, por ende se logra observar que a lo largo de todos los intervalos de temporadas, el total de DD2 se mantiene cerca de 60.
+* Por otro lado los picos en DD3 que corresponden a temporadas destacadas (2016-2024) que cuentan con jugadores sobresalientes, proporcionando un aumento significativo en Dobles-Triples podría deberse a un mayor ritmo de juego y posesiones por partido.
 
-### DD2
-NUEVA DESCRIPCION. 
-
-### DD3
-NUEVA DESCRIPCION.
-
-```{r Grafico Bivariante 7 8 Y 9, echo=FALSE, fig.align='center', fig.width=8, out.width='80%'}
+# Gráficos de barras
+```{r Grafico Bivariante 7, echo=FALSE, fig.align='center', fig.width=8, out.width='80%'}
 # Promedio de puntos por doble
-ggplot(NBA, aes(x = intervalo, y = PTS2PT., fill = intervalo)) +
-  geom_bar(stat = "identity") +
-  labs(title = "Distribución de Puntos por Doble Puntos por Intervalo de Temporada", x = "Intervalo de Temporada", y = "Puntos por Dobles") +
-  theme_minimal() +
-  theme(plot.title = element_text(size = 10, face = "bold"))
-
-# Puntos por triple
-ggplot(NBA, aes(x = intervalo, y = PTS3PT., fill = intervalo)) +
-  geom_bar(stat = "identity") +
-  labs(title = "Distribución de Puntos por Triple Punto por Intervalo de Temporada", x = "Intervalo de Temporada", y = "Puntos por Triples") +
-  theme_minimal() +
-  theme(plot.title = element_text(size = 10, face = "bold"))
-
-# Puntos por tiro libre
-ggplot(NBA, aes(x = intervalo, y = PTSFT., fill = intervalo)) +
-  geom_bar(stat = "identity") +
-  labs(title = "Distribución de Puntos por Tiros Libres por Intervalo de Temporada", x = "Intervalo de Temporada", y = "Puntos por Tiros Libres") +
-  theme_minimal() +
-  theme(plot.title = element_text(size = 10, face = "bold"))
-
+ggplot(Promedio_PTS2PT, aes(x = intervalo, y = total_PTS2PT, fill = intervalo)) +
+                    geom_bar(stat = "identity") +
+                    labs(title = "Puntos por Dobles por Intervalo de Temporada", 
+                         x = "Intervalo de Temporada", y = "Puntos Dobles") +
+                    theme_minimal() +   
+                    theme(plot.title = element_text(size = 10, face = "bold")) +
+                    scale_fill_brewer(palette = "BuPu")
 ```
-### Estudio gráfico de la dispersión DE PUNTOS POR DOBLE POR TRIPLE Y POR TIRO LIBRE
-NUEVA DESCRIPCION.
 
+Los valores en el eje Y (1e+05 = 100,000) representan los puntos acumulados en dobles- acumulado por múltiples jugadores por intervalo de temporada, aparte se observa una clara disminución en el transcurso de las temporadas, que se relaciona a un cambio en el estilo de juego. En el periodo (1996-2000) Dominaban los jugadores con dobles más consistentes a diferencia del periodo (2020-2024).
 
-## Conclusiones
+```{r Grafico Bivariante 8, echo=FALSE, fig.align='center', fig.width=8, out.width='80%'}
+# Puntos por tripleggplot
+ggplot(Promedio_PTS3PT, aes(x = intervalo, y = total_PTS3PT, fill = intervalo)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Distribución de Puntos de Triples por Intervalo de Temporada", x = "Intervalo de Temporada", y = "Puntos por Triple") + 
+  theme_minimal() +
+  theme(plot.title = element_text(size = 10, face = "bold")) + scale_fill_brewer(palette="BuPu")
+```
+
+En la NBA, un jugador normalmente contribuye con 10–30 puntos triple por partido, por lo que 30 puntos en promedio de jugador por intervalo implicarían un volumen muy alto que se refiere al puntaje acumulado para múltiples jugadores, aparte se puede ver un aumento progresivo en los puntos por triples, que refleja un mayor énfasis en la versatilidad de los jugadores. Durante el periodo (2020-2024) se notan valores muy altos, esto a causa de Stephen Curry, quien promedia un alto rendimiento en la converción de triples para estos ultimos intervalos de tiempo.
+
+```{r Grafico Bivariante 9, echo=FALSE, fig.align='center', fig.width=8, out.width='80%'}
+# Puntos por tiro libre
+ggplot(Promedio_PTSFT, aes(x = intervalo, y = total_PTSFT, fill = intervalo)) +
+geom_bar(stat = "identity") +
+  labs(title = "Distribución de Puntos por Tiros Libres en Intervalo de Temporada", x = "Intervalo de Temporada", y = "Puntos por Tiros Libres") +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 10, face = "bold")) + scale_fill_brewer(palette="BuPu")
+```
+
+El grafico representa una disminución de puntos a lo largo de las temporadas, que puede deberse a jugadores con más faltas cometidas, menos énfasis en tiros de campo o triples. Los PTSFT pueden correlacionarse con métricas como porcentaje de tiros libres (FT%), durante la temporada (2021-2022), la NBA implementó cambios en las reglas para reducir las faltas ofensivas intencionales, lo que conllevo a la disminución en el número de tiros libres.
+
+# Conclusiones
 * En la NBA se han implementado una serie de nuevos reglamentos y técnicas de entrenamiento, con la finalidad de buscar una mejor afinidad al momento de realizar los juegos de Basquetbol, donde estos tipos de cambio han tenido impacto en los juegos del mismo, mejorando tanto los métodos defensivos como ofensivos de los jugadores, bien sea para obtener un mejor rendimiento o en algunos casos un peor rendimiento.
 * Algunas épocas están enmarcadas por una serie de estrellas Basquetbolistas que por su talento y hazaña ha ayudado que sus periodos de tiempo aumentaran en buenas medidas sus registros y gráficas.
