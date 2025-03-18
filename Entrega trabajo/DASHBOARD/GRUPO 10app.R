@@ -126,13 +126,6 @@ ui <- dashboardPage(
           tags$li("Leonardo Mentado C.I: 29.850.786."),
           tags$li("Samuel Barreto C.I: 31.484.531.")
         ),
-        h3("Instrucciones:"),
-        tags$ol(
-          tags$li("Selecciona la pestaña 'Gráficos Seleccionados' para ver los gráficos disponibles."),
-          tags$li("Usa los filtros en la pestaña 'Filtros' para ajustar el intervalo de tiempo."),
-          tags$li("Explora los gráficos y descarga los datos si es necesario.")
-        ),
-        
       ),
       tabItem(
         tabName = "graficos",
@@ -173,8 +166,12 @@ ui <- dashboardPage(
       ),
       tabItem(
         tabName = "ayuda",
-        h2("Ayuda"),
-        p("Instrucciones detalladas sobre cómo usar la aplicación...")
+        h2("Instrucciones"),
+        tags$ol(
+          tags$li("Selecciona la pestaña 'Gráficos Seleccionados' para ver los gráficos disponibles."),
+          tags$li("Usa los filtros en la pestaña 'Filtros' para ajustar el intervalo de tiempo."),
+          tags$li("Explora los gráficos y descarga los datos si es necesario.")
+        ),
       )
     )
   )
