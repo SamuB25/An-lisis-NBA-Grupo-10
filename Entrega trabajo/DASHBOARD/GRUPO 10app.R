@@ -18,8 +18,9 @@ library(DT)
 library(shinythemes)
 library(rsconnect)
 
+
 # Lectura de base de datos
-NBA <- read_excel("~/An-lisis-NBA-Grupo-10/NBA G1-G10.xlsx")
+NBA <- read_excel("NBA G1-G10.xlsx")
 
 # Limpieza de nombres de columnas
 names(NBA) <- make.names(names(NBA))
