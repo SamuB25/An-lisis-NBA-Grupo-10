@@ -22,8 +22,17 @@ El rendimiento de los jugadores de la NBA ha evolucionado significativamente en 
 •	Se analizarán variables como puntos por partido, asistencias, porcentaje de tiros de campo, entre otros.
 
 ## Variables a Analizar
-* Variables Dependientes: Puntos por temporada (PTS), Asistencias por temporada (AST), total de tiros realizados (FGA), porcentaje de tiros anotados (FG%), total de tiros anotados (FGM), Dobles-Dobles (DD2), Triples-Dobles (DD3), Tiros libres anotados (FTM).
-* Variables Independientes: Temporada en el periodo Cuatrienal (season). 
+* Puntos por temporada (PTS)
+* Porcentaje de asistencias por intervalo de temporada (AST.)
+* Total de DD3 (X3P.)
+* Porcentaje de tiros anotados (FG.)
+* Dobles-Dobles (DD2)
+* Triples-Dobles (DD3)
+* Puntos por DD2 (PTS2PT)
+* Puntos por DD3 (PTS3PT)
+* Porcentaje de Tiros libres anotados (FT.)
+* Puntos por Tiro libre (PTSFT.)
+* Temporada en el periodo Cuatrienal (season)
 
 Estas métricas son indicadores clave del rendimiento en la creación de puntos en periodos cuatrienales y permiten evaluar tendencias a lo largo del tiempo.
 
