@@ -36,3 +36,5 @@ La NBA ha experimentado cambios significativos en las últimas tres décadas, co
 
 ## Base de datos usanda en el Trabajo
 https://drive.google.com/file/d/1ysNV11MwBDXRfg_THdXXpRUhfDNCIkE2/view?usp=classroom_web&authuser=0
+
+*Link para Dashboard del Análasis de los Datos de la NBA: https://leonardo-mentado-analisis-nba.shinyapps.io/dashboard/
